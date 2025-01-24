@@ -41,3 +41,4 @@ C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\refint
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.pdb
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.genruntimeconfig.cache
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ref\ExcelDataFixer.dll
+C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.sourcelink.json

@@ -5,15 +5,98 @@
 
 <h2>Excel Data Processor</h2>
 
-<form asp-controller="Excel" asp-action="ProcessExcel" enctype="multipart/form-data" method="post">
-    <div>
-        <label for="excelFile">Upload Excel File:</label>
-        <input type="file" name="excelFile" id="excelFile" accept=".xls,.xlsx" required />
-    </div>
-    <button type="submit">Upload and Process</button>
-</form>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
 
-@if (ViewBag.MissingData != null)
-{
-    <p style="color: red;">@ViewBag.MissingData</p>
-}
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .upload-section {
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 10px 15px;
+        font-size: 14px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+<div class="container">
+    <div class="upload-section">
+        <form asp-controller="Excel" asp-action="ProcessExcel" enctype="multipart/form-data" method="post">
+            <label for="excelFile">Upload Excel File:</label>
+            <input type="file" name="excelFile" id="excelFile" accept=".xls,.xlsx" required />
+            <button type="submit">Upload and Process</button>
+        </form>
+        <div class="button-container">
+            <form asp-controller="Excel" asp-action="ClearData" method="post" style="display: inline;">
+                <button type="submit">Clear Data</button>
+            </form>
+            <form asp-controller="Excel" asp-action="RevertData" method="post" style="display: inline;">
+                <button type="submit">Revert Data</button>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.DataTable != null)
+    {
+        <table>
+            <thead>
+                <tr>
+                    @foreach (System.Data.DataColumn column in ((System.Data.DataTable)ViewBag.DataTable).Columns)
+                    {
+                        <th>@column.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows)
+                {
+                    <tr>
+                        @foreach (var item in row.ItemArray)
+                        {
+                            <td>@item</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

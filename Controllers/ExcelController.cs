@@ -3,13 +3,17 @@ using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Data;
 
 namespace ExcelDataFixer.Controllers;
 
 public class ExcelController : Controller
 {
+    private static DataTable _backupDataTable;
+
     public IActionResult Index()
     {
+        ViewBag.DataTable = null; // Clear old data on page load
         return View();
     }
 
@@ -22,16 +26,11 @@ public class ExcelController : Controller
             return View("Index");
         }
 
-        // Set the license context globally
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set license context for EPPlus
 
         using (var stream = new MemoryStream())
         {
             excelFile.CopyTo(stream);
-
-            // Ensure the stream's position is reset to the start
-            stream.Position = 0;
-
             using (var package = new ExcelPackage(stream))
             {
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
@@ -44,39 +43,156 @@ public class ExcelController : Controller
                 var rowCount = worksheet.Dimension.Rows;
                 var colCount = worksheet.Dimension.Columns;
 
-                // Add "Dear" prefix to column A (assuming column A contains names)
-                for (int row = 2; row <= rowCount; row++) // Assuming headers are in row 1
+                // Create a DataTable to hold the Excel data
+                DataTable table = new DataTable();
+
+                // Add columns to the DataTable
+                for (int col = 1; col <= colCount; col++)
                 {
-                    var cellValue = worksheet.Cells[row, 1].Text;
-                    if (!string.IsNullOrWhiteSpace(cellValue) && !cellValue.StartsWith("Dear"))
-                    {
-                        worksheet.Cells[row, 1].Value = $"Dear {cellValue}";
-                    }
+                    table.Columns.Add(worksheet.Cells[1, col].Text ?? $"Column {col}");
                 }
 
-                // Check for missing data in required columns (A and B as examples)
-                var missingDataRows = new List<int>();
+                // Add rows to the DataTable with custom logic for Column 2 and Column 6
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    if (string.IsNullOrWhiteSpace(worksheet.Cells[row, 1].Text) ||
-                        string.IsNullOrWhiteSpace(worksheet.Cells[row, 2].Text))
+                    var dataRow = table.NewRow();
+                    bool isReplacementRow = worksheet.Cells[row, 1].Text.Trim().Equals("Васил Динолов", StringComparison.OrdinalIgnoreCase) &&
+                                            worksheet.Cells[row, 3].Text.Trim().Equals("vasil.dinolov@orakgroup.com", StringComparison.OrdinalIgnoreCase);
+
+                    for (int col = 1; col <= colCount; col++)
                     {
-                        missingDataRows.Add(row);
+                        if (isReplacementRow)
+                        {
+                            // Replace specific user data
+                            if (col == 1) dataRow[col - 1] = "Цветан Карабов";
+                            else if (col == 2) dataRow[col - 1] = "0888227303";
+                            else if (col == 3) dataRow[col - 1] = "tsvetan.karabov@orakgroup.com";
+                            else dataRow[col - 1] = worksheet.Cells[row, col].Text; // Keep original for other columns
+                        }
+                        else
+                        {
+                            var cellValue = worksheet.Cells[row, col].Text;
+
+                            // Replace the name Васил Динолов with Цветан Карабов in Column 3
+                            if (col == 3 && cellValue.Trim().Equals("Васил Динолов", StringComparison.OrdinalIgnoreCase))
+                            {
+                                dataRow[col - 1] = "Цветан Карабов";
+                            }
+                            // Replace the number 0886988005 with 0888227303 in Column 4
+                            else if (col == 4 && cellValue.Trim().Equals("0886988005", StringComparison.OrdinalIgnoreCase))
+                            {
+                                dataRow[col - 1] = "0888227303";
+                            }
+                            // Replace the email vasil.dinolov@orakgroup.com with tsvetan.karabov@orakgroup.com in Column 5
+                            else if (col == 5 && cellValue.Trim().Equals("vasil.dinolov@orakgroup.com", StringComparison.OrdinalIgnoreCase))
+                            {
+                                dataRow[col - 1] = "tsvetan.karabov@orakgroup.com";
+                            }
+                            // Automatically add titles based on names from Column 25 in Column 2
+                            else if (col == 2)
+                            {
+                                var nameFromColumn25 = worksheet.Cells[row, 25].Text; // Read from Column 25
+                                if (!string.IsNullOrWhiteSpace(nameFromColumn25))
+                                {
+                                    if (nameFromColumn25.EndsWith("ова") || nameFromColumn25.EndsWith("ева")) // Female surname endings
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {nameFromColumn25}";
+                                    }
+                                    else if (nameFromColumn25.EndsWith("ов") || nameFromColumn25.EndsWith("ев")) // Male surname endings
+                                    {
+                                        dataRow[col - 1] = $"Уважаеми г-н {nameFromColumn25}";
+                                    }
+                                    else
+                                    {
+                                        dataRow[col - 1] = nameFromColumn25; // Keep original if no match
+                                    }
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = string.Empty; // Leave empty if no data
+                                }
+                            }
+                            else if (col == 6)
+                            {
+                                // Add titles to Column 6 based on names in Column 3
+                                var nameFromColumn3 = dataRow[2]?.ToString().Trim(); // Read from DataRow directly
+                                if (!string.IsNullOrEmpty(nameFromColumn3))
+                                {
+                                    if (nameFromColumn3.Equals("Цветан Карабов", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        dataRow[col - 1] = "Директор Дигитално образование и Иновации";
+                                    }
+                                    else
+                                    {
+                                        switch (nameFromColumn3)
+                                        {
+                                            case "Виктория Добрева":
+                                                dataRow[col - 1] = "Старши търговски сътрудник";
+                                                break;
+                                            case "Борислава Димова":
+                                                dataRow[col - 1] = "Старши търговски сътрудник";
+                                                break;
+                                            case "Христина Илчева":
+                                                dataRow[col - 1] = "Старши търговски сътрудник";
+                                                break;
+                                            case "Йордан Тотев":
+                                                dataRow[col - 1] = "Търговски представител - област Бургас";
+                                                break;
+                                            case "Милена Цанова":
+                                                dataRow[col - 1] = "Търговски представител - област Варна";
+                                                break;
+                                            case "Мариета Йорданова":
+                                                dataRow[col - 1] = "Търговски представител - София 2";
+                                                break;
+                                            default:
+                                                dataRow[col - 1] = string.Empty; // Leave empty if no match
+                                                break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = string.Empty; // Leave empty if no name in Column 3
+                                }
+                            }
+
+                            else
+                            {
+                                dataRow[col - 1] = cellValue; // Keep original value
+                            }
+                        }
                     }
+                    table.Rows.Add(dataRow);
                 }
 
-                if (missingDataRows.Any())
-                {
-                    ViewBag.MissingData = $"Rows with missing data: {string.Join(", ", missingDataRows)}";
-                }
+                _backupDataTable = table.Copy(); // Backup the data for revert functionality
+                ViewBag.DataTable = table; // Pass the DataTable to the View
 
-                // Export the processed file
-                var outputStream = new MemoryStream();
-                package.SaveAs(outputStream);
-                outputStream.Position = 0;
-
-                return File(outputStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ProcessedFile.xlsx");
+                return View("Index");
             }
         }
+    }
+
+    [HttpPost]
+    public IActionResult ClearData()
+    {
+        ViewBag.DataTable = null;
+        ViewBag.Message = "Data cleared successfully.";
+        return View("Index");
+    }
+
+    [HttpPost]
+    public IActionResult RevertData()
+    {
+        if (_backupDataTable != null)
+        {
+            ViewBag.DataTable = _backupDataTable.Copy(); // Restore the backup data
+            ViewBag.Message = "Data reverted successfully.";
+        }
+        else
+        {
+            ViewBag.Message = "No data to revert.";
+        }
+        return View("Index");
     }
 }

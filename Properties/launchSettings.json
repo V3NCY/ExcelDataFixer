@@ -18,6 +18,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    /*This is the url to view the project*/
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
