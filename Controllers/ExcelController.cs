@@ -10,6 +10,7 @@ namespace ExcelDataFixer.Controllers;
 public class ExcelController : Controller
 {
     private static DataTable _backupDataTable;
+    private static DataTable _currentDataTable;
 
     public IActionResult Index()
     {
@@ -43,14 +44,41 @@ public class ExcelController : Controller
                 var rowCount = worksheet.Dimension.Rows;
                 var colCount = worksheet.Dimension.Columns;
 
+                if (rowCount > 20000)
+                {
+                    ViewBag.Message = "The uploaded file exceeds the maximum allowed rows (20,000). Please reduce the data size.";
+                    return View("Index");
+                }
+
                 // Create a DataTable to hold the Excel data
                 DataTable table = new DataTable();
 
                 // Add columns to the DataTable
+                // Add columns to the DataTable
                 for (int col = 1; col <= colCount; col++)
                 {
-                    table.Columns.Add(worksheet.Cells[1, col].Text ?? $"Column {col}");
+                    string columnName = worksheet.Cells[1, col].Text.Trim();
+
+                    // Ensure unique column names
+                    if (string.IsNullOrWhiteSpace(columnName))
+                    {
+                        columnName = $"Column {col}";
+                    }
+                    else
+                    {
+                        int duplicateCount = 1;
+                        string originalName = columnName;
+
+                        // Check for duplicates and modify the name
+                        while (table.Columns.Contains(columnName))
+                        {
+                            columnName = $"{originalName}_{duplicateCount++}";
+                        }
+                    }
+
+                    table.Columns.Add(columnName);
                 }
+
 
                 // Add rows to the DataTable with custom logic for Column 2, Column 6, and Column 32
                 for (int row = 2; row <= rowCount; row++)
@@ -67,6 +95,7 @@ public class ExcelController : Controller
                             if (col == 1) dataRow[col - 1] = "Цветан Карабов";
                             else if (col == 2) dataRow[col - 1] = "0888227303";
                             else if (col == 3) dataRow[col - 1] = "tsvetan.karabov@orakgroup.com";
+                            else if (col == 6) dataRow[col - 1] = "Директор Дигитално образование и Иновации";
                             else dataRow[col - 1] = worksheet.Cells[row, col].Text; // Keep original for other columns
                         }
                         else
@@ -115,43 +144,35 @@ public class ExcelController : Controller
                             else if (col == 6)
                             {
                                 // Add titles to Column 6 based on names in Column 3
-                                var nameFromColumn3 = dataRow[2]?.ToString().Trim(); // Read the processed data in Column 3
-                                if (!string.IsNullOrEmpty(nameFromColumn3))
+                                var nameFromColumn3 = worksheet.Cells[row, 3].Text.Trim();
+                                switch (nameFromColumn3)
                                 {
-                                    switch (nameFromColumn3)
-                                    {
-                                        case "Виктория Добрева":
-                                            dataRow[col - 1] = "Старши търговски сътрудник";
-                                            break;
-                                        case "Борислава Димова":
-                                            dataRow[col - 1] = "Старши търговски сътрудник";
-                                            break;
-                                        case "Христина Илчева":
-                                            dataRow[col - 1] = "Старши търговски сътрудник";
-                                            break;
-                                        case "Йордан Тотев":
-                                            dataRow[col - 1] = "Търговски представител - област Бургас";
-                                            break;
-                                        case "Милена Цанова":
-                                            dataRow[col - 1] = "Търговски представител - област Варна";
-                                            break;
-                                        case "Мариета Йорданова":
-                                            dataRow[col - 1] = "Търговски представител - София 2";
-                                            break;
-                                        case "Цветан Карабов":
-                                            dataRow[col - 1] = "Директор Дигитално образование и Иновации";
-                                            break;
-                                        default:
-                                            dataRow[col - 1] = string.Empty; // Leave empty if no match
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    dataRow[col - 1] = string.Empty; // Leave empty if no data in Column 3
+                                    case "Виктория Добрева":
+                                        dataRow[col - 1] = "Старши търговски сътрудник";
+                                        break;
+                                    case "Борислава Димова":
+                                        dataRow[col - 1] = "Старши търговски сътрудник";
+                                        break;
+                                    case "Христина Илчева":
+                                        dataRow[col - 1] = "Старши търговски сътрудник";
+                                        break;
+                                    case "Йордан Тотев":
+                                        dataRow[col - 1] = "Търговски представител - област Бургас";
+                                        break;
+                                    case "Милена Цанова":
+                                        dataRow[col - 1] = "Търговски представител - област Варна";
+                                        break;
+                                    case "Мариета Йорданова":
+                                        dataRow[col - 1] = "Търговски представител - София 2";
+                                        break;
+                                    case "Цветан Карабов":
+                                        dataRow[col - 1] = "Директор Дигитално образование и Иновации";
+                                        break;
+                                    default:
+                                        dataRow[col - 1] = string.Empty; // Leave empty if no match
+                                        break;
                                 }
                             }
-
                             else if (col == 32)
                             {
                                 // Add email based on Column 22
@@ -174,6 +195,7 @@ public class ExcelController : Controller
                     table.Rows.Add(dataRow);
                 }
 
+                _currentDataTable = table.Copy(); // Save the processed data
                 _backupDataTable = table.Copy(); // Backup the data for revert functionality
                 ViewBag.DataTable = table; // Pass the DataTable to the View
 
@@ -203,5 +225,42 @@ public class ExcelController : Controller
             ViewBag.Message = "No data to revert.";
         }
         return View("Index");
+    }
+
+    [HttpPost]
+    public IActionResult ExportExcel()
+    {
+        if (_currentDataTable == null || _currentDataTable.Rows.Count == 0)
+        {
+            ViewBag.Message = "No data to export.";
+            return View("Index");
+        }
+
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+            // Add column headers
+            for (int col = 0; col < _currentDataTable.Columns.Count; col++)
+            {
+                worksheet.Cells[1, col + 1].Value = _currentDataTable.Columns[col].ColumnName;
+            }
+
+            // Add rows
+            for (int row = 0; row < _currentDataTable.Rows.Count; row++)
+            {
+                for (int col = 0; col < _currentDataTable.Columns.Count; col++)
+                {
+                    worksheet.Cells[row + 2, col + 1].Value = _currentDataTable.Rows[row][col];
+                }
+            }
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            var fileName = $"ProcessedFile-edited.xlsx";
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
     }
 }

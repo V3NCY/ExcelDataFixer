@@ -74,6 +74,10 @@
             </form>
         </div>
     </div>
+            <form asp-action="ExportExcel" method="post" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-success">Export</button>
+            </form>
+
 
     @if (ViewBag.DataTable != null)
     {
