@@ -52,7 +52,7 @@ public class ExcelController : Controller
                     table.Columns.Add(worksheet.Cells[1, col].Text ?? $"Column {col}");
                 }
 
-                // Add rows to the DataTable with custom logic for Column 2 and Column 6
+                // Add rows to the DataTable with custom logic for Column 2, Column 6, and Column 32
                 for (int row = 2; row <= rowCount; row++)
                 {
                     var dataRow = table.NewRow();
@@ -115,47 +115,56 @@ public class ExcelController : Controller
                             else if (col == 6)
                             {
                                 // Add titles to Column 6 based on names in Column 3
-                                var nameFromColumn3 = dataRow[2]?.ToString().Trim(); // Read from DataRow directly
+                                var nameFromColumn3 = dataRow[2]?.ToString().Trim(); // Read the processed data in Column 3
                                 if (!string.IsNullOrEmpty(nameFromColumn3))
                                 {
-                                    if (nameFromColumn3.Equals("Цветан Карабов", StringComparison.OrdinalIgnoreCase))
+                                    switch (nameFromColumn3)
                                     {
-                                        dataRow[col - 1] = "Директор Дигитално образование и Иновации";
-                                    }
-                                    else
-                                    {
-                                        switch (nameFromColumn3)
-                                        {
-                                            case "Виктория Добрева":
-                                                dataRow[col - 1] = "Старши търговски сътрудник";
-                                                break;
-                                            case "Борислава Димова":
-                                                dataRow[col - 1] = "Старши търговски сътрудник";
-                                                break;
-                                            case "Христина Илчева":
-                                                dataRow[col - 1] = "Старши търговски сътрудник";
-                                                break;
-                                            case "Йордан Тотев":
-                                                dataRow[col - 1] = "Търговски представител - област Бургас";
-                                                break;
-                                            case "Милена Цанова":
-                                                dataRow[col - 1] = "Търговски представител - област Варна";
-                                                break;
-                                            case "Мариета Йорданова":
-                                                dataRow[col - 1] = "Търговски представител - София 2";
-                                                break;
-                                            default:
-                                                dataRow[col - 1] = string.Empty; // Leave empty if no match
-                                                break;
-                                        }
+                                        case "Виктория Добрева":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Борислава Димова":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Христина Илчева":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Йордан Тотев":
+                                            dataRow[col - 1] = "Търговски представител - област Бургас";
+                                            break;
+                                        case "Милена Цанова":
+                                            dataRow[col - 1] = "Търговски представител - област Варна";
+                                            break;
+                                        case "Мариета Йорданова":
+                                            dataRow[col - 1] = "Търговски представител - София 2";
+                                            break;
+                                        case "Цветан Карабов":
+                                            dataRow[col - 1] = "Директор Дигитално образование и Иновации";
+                                            break;
+                                        default:
+                                            dataRow[col - 1] = string.Empty; // Leave empty if no match
+                                            break;
                                     }
                                 }
                                 else
                                 {
-                                    dataRow[col - 1] = string.Empty; // Leave empty if no name in Column 3
+                                    dataRow[col - 1] = string.Empty; // Leave empty if no data in Column 3
                                 }
                             }
 
+                            else if (col == 32)
+                            {
+                                // Add email based on Column 22
+                                var codeFromColumn22 = worksheet.Cells[row, 22].Text.Trim();
+                                if (!string.IsNullOrWhiteSpace(codeFromColumn22))
+                                {
+                                    dataRow[col - 1] = $"info-{codeFromColumn22}@edu.mon.bg";
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = string.Empty; // Leave empty if no code in Column 22
+                                }
+                            }
                             else
                             {
                                 dataRow[col - 1] = cellValue; // Keep original value
