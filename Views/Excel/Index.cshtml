@@ -1,0 +1,19 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Excel Data Processor";
+}
+
+<h2>Excel Data Processor</h2>
+
+<form asp-controller="Excel" asp-action="ProcessExcel" enctype="multipart/form-data" method="post">
+    <div>
+        <label for="excelFile">Upload Excel File:</label>
+        <input type="file" name="excelFile" id="excelFile" accept=".xls,.xlsx" required />
+    </div>
+    <button type="submit">Upload and Process</button>
+</form>
+
+@if (ViewBag.MissingData != null)
+{
+    <p style="color: red;">@ViewBag.MissingData</p>
+}
