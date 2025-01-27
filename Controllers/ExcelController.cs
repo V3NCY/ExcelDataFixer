@@ -127,6 +127,11 @@ public class ExcelController : Controller
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {nameFromColumn25}";
                                     }
+                                    else if (nameFromColumn25.EndsWith("ина") || nameFromColumn25.EndsWith("рян")) // Female surname endings
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {nameFromColumn25}";
+                                    }
+
                                     else if (nameFromColumn25.EndsWith("ов") || nameFromColumn25.EndsWith("ев")) // Male surname endings
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {nameFromColumn25}";
