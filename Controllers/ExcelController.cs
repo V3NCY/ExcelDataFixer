@@ -92,7 +92,40 @@ public class ExcelController : Controller
                             else if (col == 6) dataRow[col - 1] = "Директор Дигитално образование и Иновации";
                             else dataRow[col - 1] = worksheet.Cells[row, col].Text; // Keep original for other columns
                         }
+                        else if (col == 10) 
+                        {
+                            var objectName = worksheet.Cells[row, col]?.Text?.Trim();
 
+                            if (!string.IsNullOrWhiteSpace(objectName))
+                            {
+                                // Identify the prefix (e.g., "Основно училище") and separate the remaining name
+                                var prefixEndIndex = objectName.IndexOf("училище") + "училище".Length;
+
+                                if (prefixEndIndex > 0 && prefixEndIndex < objectName.Length)
+                                {
+                                    string prefix = objectName.Substring(0, prefixEndIndex).Trim(); // Extract prefix
+                                    string name = objectName.Substring(prefixEndIndex).Trim();     // Extract remaining name
+
+                                    // Add quotes around the name portion if not already present
+                                    if (!name.StartsWith("\"") && !name.EndsWith("\""))
+                                    {
+                                        name = $"\"{name}\"";
+                                    }
+
+                                    // Combine the prefix and the properly quoted name
+                                    dataRow[col - 1] = $"{prefix} {name}";
+                                }
+                                else
+                                {
+                                    // If no valid prefix is found, keep the original value
+                                    dataRow[col - 1] = objectName;
+                                }
+                            }
+                            else
+                            {
+                                dataRow[col - 1] = string.Empty; // Handle empty cells
+                            }
+                        }
                         else
                         {
                             var cellValue = worksheet.Cells[row, col].Text;
@@ -115,37 +148,45 @@ public class ExcelController : Controller
                             // Automatically add titles based on names from Column 25 in Column 2
                             else if (col == 2)
                             {
-                                var nameFromColumn25 = worksheet.Cells[row, 25]?.Text?.Trim(); // Взима стойността от колоната 25
+                                var nameFromColumn25 = worksheet.Cells[row, 25]?.Text?.Trim();
                                 if (!string.IsNullOrWhiteSpace(nameFromColumn25))
                                 {
-                                    // Извличаме фамилията (последната дума от името)
+                                    // Takes the surname
                                     var lastName = nameFromColumn25.Split(' ').Last();
 
-                                    // Проверка за окончанията на фамилията
-                                    if (lastName.EndsWith("ова") || lastName.EndsWith("ева")) // Женски фамилии
+                                    // Checks the surname's ending
+                                    if (lastName.EndsWith("ова") || lastName.EndsWith("ева")) // Female addressing
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
-                                    else if (lastName.EndsWith("ина") || lastName.EndsWith("рян")) // Женски фамилии
+                                    else if (lastName.EndsWith("ина") || lastName.EndsWith("рян")) // Female addressing
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
-                                    else if (lastName.EndsWith("ска")) // Женски фамилии
+                                    else if (lastName.EndsWith("ОВА") || lastName.EndsWith("ЕВА")) // Female addressing
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
-                                    else if (lastName.EndsWith("ов") || lastName.EndsWith("ев")) // Мъжки фамилии
+                                    else if (lastName.EndsWith("ска")) // Female addressing
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ов") || lastName.EndsWith("ев")) // Male addressing
+                                    {
+                                        dataRow[col - 1] = $"Уважаеми г-н {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ьо") || lastName.EndsWith("ялк")) // Male addressing
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
                                     }
                                     else
                                     {
-                                        dataRow[col - 1] = $"Уважаеми {lastName}"; // Дефолтно обръщение, ако окончанието е неутрално
+                                        dataRow[col - 1] = $"{lastName}"; // Gives just the surname if its unidentified
                                     }
                                 }
                                 else
                                 {
-                                    dataRow[col - 1] = string.Empty; // Ако колоната е празна
+                                    dataRow[col - 1] = string.Empty; // If the column is empty
                                 }
                             }
 
@@ -273,6 +314,8 @@ public class ExcelController : Controller
                             {
                                 dataRow[col - 1] = cellValue;
                             }
+
+
                         }
                     }
                     table.Rows.Add(dataRow);
