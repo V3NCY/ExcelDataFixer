@@ -18,6 +18,7 @@ public class ExcelController : Controller
         return View();
     }
 
+
     [HttpPost]
     public IActionResult ProcessExcel(IFormFile excelFile)
     {
@@ -27,7 +28,7 @@ public class ExcelController : Controller
             return View("Index");
         }
 
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Set license context for EPPlus
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
         using (var stream = new MemoryStream())
         {
@@ -50,16 +51,12 @@ public class ExcelController : Controller
                     return View("Index");
                 }
 
-                // Create a DataTable to hold the Excel data
                 DataTable table = new DataTable();
 
-                // Add columns to the DataTable
-                // Add columns to the DataTable
                 for (int col = 1; col <= colCount; col++)
                 {
                     string columnName = worksheet.Cells[1, col].Text.Trim();
 
-                    // Ensure unique column names
                     if (string.IsNullOrWhiteSpace(columnName))
                     {
                         columnName = $"Column {col}";
@@ -69,7 +66,6 @@ public class ExcelController : Controller
                         int duplicateCount = 1;
                         string originalName = columnName;
 
-                        // Check for duplicates and modify the name
                         while (table.Columns.Contains(columnName))
                         {
                             columnName = $"{originalName}_{duplicateCount++}";
@@ -80,7 +76,6 @@ public class ExcelController : Controller
                 }
 
 
-                // Add rows to the DataTable with custom logic for Column 2, Column 6, and Column 32
                 for (int row = 2; row <= rowCount; row++)
                 {
                     var dataRow = table.NewRow();
@@ -91,13 +86,13 @@ public class ExcelController : Controller
                     {
                         if (isReplacementRow)
                         {
-                            // Replace specific user data
                             if (col == 1) dataRow[col - 1] = "Цветан Карабов";
                             else if (col == 2) dataRow[col - 1] = "0888227303";
                             else if (col == 3) dataRow[col - 1] = "tsvetan.karabov@orakgroup.com";
                             else if (col == 6) dataRow[col - 1] = "Директор Дигитално образование и Иновации";
                             else dataRow[col - 1] = worksheet.Cells[row, col].Text; // Keep original for other columns
                         }
+
                         else
                         {
                             var cellValue = worksheet.Cells[row, col].Text;
@@ -120,62 +115,145 @@ public class ExcelController : Controller
                             // Automatically add titles based on names from Column 25 in Column 2
                             else if (col == 2)
                             {
-                                var nameFromColumn25 = worksheet.Cells[row, 25].Text; // Read from Column 25
+                                var nameFromColumn25 = worksheet.Cells[row, 25]?.Text?.Trim(); // Взима стойността от колоната 25
                                 if (!string.IsNullOrWhiteSpace(nameFromColumn25))
                                 {
-                                    if (nameFromColumn25.EndsWith("ова") || nameFromColumn25.EndsWith("ева")) // Female surname endings
-                                    {
-                                        dataRow[col - 1] = $"Уважаема г-жо {nameFromColumn25}";
-                                    }
-                                    else if (nameFromColumn25.EndsWith("ина") || nameFromColumn25.EndsWith("рян")) // Female surname endings
-                                    {
-                                        dataRow[col - 1] = $"Уважаема г-жо {nameFromColumn25}";
-                                    }
+                                    // Извличаме фамилията (последната дума от името)
+                                    var lastName = nameFromColumn25.Split(' ').Last();
 
-                                    else if (nameFromColumn25.EndsWith("ов") || nameFromColumn25.EndsWith("ев")) // Male surname endings
+                                    // Проверка за окончанията на фамилията
+                                    if (lastName.EndsWith("ова") || lastName.EndsWith("ева")) // Женски фамилии
                                     {
-                                        dataRow[col - 1] = $"Уважаеми г-н {nameFromColumn25}";
+                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ина") || lastName.EndsWith("рян")) // Женски фамилии
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ска")) // Женски фамилии
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ов") || lastName.EndsWith("ев")) // Мъжки фамилии
+                                    {
+                                        dataRow[col - 1] = $"Уважаеми г-н {lastName}";
                                     }
                                     else
                                     {
-                                        dataRow[col - 1] = nameFromColumn25; // Keep original if no match
+                                        dataRow[col - 1] = $"Уважаеми {lastName}"; // Дефолтно обръщение, ако окончанието е неутрално
                                     }
                                 }
                                 else
                                 {
-                                    dataRow[col - 1] = string.Empty; // Leave empty if no data
+                                    dataRow[col - 1] = string.Empty; // Ако колоната е празна
                                 }
                             }
+
                             else if (col == 6)
                             {
                                 // Add titles to Column 6 based on names in Column 3
                                 var nameFromColumn3 = worksheet.Cells[row, 3].Text.Trim();
-                                switch (nameFromColumn3)
+                                if (!string.IsNullOrWhiteSpace(nameFromColumn3))
                                 {
-                                    case "Виктория Добрева":
-                                        dataRow[col - 1] = "Старши търговски сътрудник";
-                                        break;
-                                    case "Борислава Димова":
-                                        dataRow[col - 1] = "Старши търговски сътрудник";
-                                        break;
-                                    case "Христина Илчева":
-                                        dataRow[col - 1] = "Старши търговски сътрудник";
-                                        break;
-                                    case "Йордан Тотев":
-                                        dataRow[col - 1] = "Търговски представител - област Бургас";
-                                        break;
-                                    case "Милена Цанова":
-                                        dataRow[col - 1] = "Търговски представител - област Варна";
-                                        break;
-                                    case "Мариета Йорданова":
-                                        dataRow[col - 1] = "Търговски представител - София 2";
-                                        break;
-                                    case "Цветан Карабов":
-                                        dataRow[col - 1] = "Директор Дигитално образование и Иновации";
-                                        break;
-                                    default:
-                                        dataRow[col - 1] = string.Empty; // Leave empty if no match
-                                        break;
+                                    switch (nameFromColumn3)
+                                    {
+                                        case "Виктория Добрева":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Борислава Димова":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Христина Илчева":
+                                            dataRow[col - 1] = "Старши търговски сътрудник";
+                                            break;
+                                        case "Йордан Тотев":
+                                            dataRow[col - 1] = "Търговски представител - област Бургас";
+                                            break;
+                                        case "Милена Цанова":
+                                            dataRow[col - 1] = "Търговски представител - област Варна";
+                                            break;
+                                        case "Мариета Йорданова":
+                                            dataRow[col - 1] = "Търговски представител - София 2";
+                                            break;
+                                        case "Цветан Карабов":
+                                            dataRow[col - 1] = "Директор Дигитално образование и Иновации";
+                                            break;
+                                        default:
+                                            dataRow[col - 1] = string.Empty;
+                                            break;
+                                    }
+                                }
+                            }
+                            else if (col == 4)
+                            {
+                                // Add titles to Column 4 based on names in Column 3
+                                var nameFromColumn3 = worksheet.Cells[row, 3].Text.Trim();
+                                if (!string.IsNullOrWhiteSpace(nameFromColumn3))
+                                {
+
+
+                                    switch (nameFromColumn3)
+                                    {
+                                        case "Виктория Добрева":
+                                            dataRow[col - 1] = "0882927244";
+                                            break;
+                                        case "Борислава Димова":
+                                            dataRow[col - 1] = "0882538928";
+                                            break;
+                                        case "Христина Илчева":
+                                            dataRow[col - 1] = "0883244264";
+                                            break;
+                                        case "Йордан Тотев":
+                                            dataRow[col - 1] = "0886866222";
+                                            break;
+                                        case "Милена Цанова":
+                                            dataRow[col - 1] = "0884754064";
+                                            break;
+                                        case "Мариета Йорданова":
+                                            dataRow[col - 1] = "0887585137";
+                                            break;
+                                        case "Цветан Карабов":
+                                            dataRow[col - 1] = "0888227303";
+                                            break;
+                                        default:
+                                            dataRow[col - 1] = string.Empty;
+                                            break;
+                                    }
+                                }
+                            }
+                            else if (col == 5)
+                            {
+                                // Add titles to Column 5 based on names in Column 3
+                                var nameFromColumn3 = worksheet.Cells[row, 3].Text.Trim();
+                                if (!string.IsNullOrWhiteSpace(nameFromColumn3))
+                                {
+                                    switch (nameFromColumn3)
+                                    {
+                                        case "Виктория Добрева":
+                                            dataRow[col - 1] = "victoria.dobreva@orakgroup.com";
+                                            break;
+                                        case "Борислава Димова":
+                                            dataRow[col - 1] = "borislava.dimova@orakgroup.com";
+                                            break;
+                                        case "Христина Илчева":
+                                            dataRow[col - 1] = "hristina.ilcheva@orakgroup.com";
+                                            break;
+                                        case "Йордан Тотев":
+                                            dataRow[col - 1] = "yordan.totev@orakgroup.com";
+                                            break;
+                                        case "Милена Цанова":
+                                            dataRow[col - 1] = "milena.tsanova@orakgroup.com";
+                                            break;
+                                        case "Мариета Йорданова":
+                                            dataRow[col - 1] = "marieta.yordanova@orakgroup.com";
+                                            break;
+                                        case "Цветан Карабов":
+                                            dataRow[col - 1] = "cvetan.karabov@orakgroup.com";
+                                            break;
+                                        default:
+                                            dataRow[col - 1] = string.Empty;
+                                            break;
+                                    }
                                 }
                             }
                             else if (col == 32)
@@ -188,21 +266,21 @@ public class ExcelController : Controller
                                 }
                                 else
                                 {
-                                    dataRow[col - 1] = string.Empty; // Leave empty if no code in Column 22
+                                    dataRow[col - 1] = string.Empty;
                                 }
                             }
                             else
                             {
-                                dataRow[col - 1] = cellValue; // Keep original value
+                                dataRow[col - 1] = cellValue;
                             }
                         }
                     }
                     table.Rows.Add(dataRow);
                 }
 
-                _currentDataTable = table.Copy(); // Save the processed data
-                _backupDataTable = table.Copy(); // Backup the data for revert functionality
-                ViewBag.DataTable = table; // Pass the DataTable to the View
+                _currentDataTable = table.Copy();
+                _backupDataTable = table.Copy();
+                ViewBag.DataTable = table;
 
                 return View("Index");
             }
@@ -222,7 +300,7 @@ public class ExcelController : Controller
     {
         if (_backupDataTable != null)
         {
-            ViewBag.DataTable = _backupDataTable.Copy(); // Restore the backup data
+            ViewBag.DataTable = _backupDataTable.Copy();
             ViewBag.Message = "Data reverted successfully.";
         }
         else
@@ -267,5 +345,7 @@ public class ExcelController : Controller
             var fileName = $"ProcessedFile-edited.xlsx";
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
+
     }
+    
 }
