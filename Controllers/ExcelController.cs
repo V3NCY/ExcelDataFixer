@@ -14,7 +14,7 @@ public class ExcelController : Controller
 
     public IActionResult Index()
     {
-        ViewBag.DataTable = null; // Clear old data on page load
+        ViewBag.DataTable = null; 
         return View();
     }
 
@@ -92,32 +92,35 @@ public class ExcelController : Controller
                             else if (col == 6) dataRow[col - 1] = "Директор Дигитално образование и Иновации";
                             else dataRow[col - 1] = worksheet.Cells[row, col].Text; // Keep original for other columns
                         }
-                        else if (col == 10) 
+
+
+                        else if (col == 10) // Handles the column with the object name (e.g., "Основно училище")
                         {
                             var objectName = worksheet.Cells[row, col]?.Text?.Trim();
 
                             if (!string.IsNullOrWhiteSpace(objectName))
                             {
-                                // Identify the prefix (e.g., "Основно училище") and separate the remaining name
-                                var prefixEndIndex = objectName.IndexOf("училище") + "училище".Length;
+                                // Check if the word "училище" exists and identify the prefix and name
+                                var prefixEndIndex = objectName.ToLower().IndexOf("училище");
 
-                                if (prefixEndIndex > 0 && prefixEndIndex < objectName.Length)
+                                if (prefixEndIndex >= 0 && prefixEndIndex < objectName.Length)
                                 {
-                                    string prefix = objectName.Substring(0, prefixEndIndex).Trim(); // Extract prefix
-                                    string name = objectName.Substring(prefixEndIndex).Trim();     // Extract remaining name
+                                    // Extract prefix (e.g., "Основно училище") and the name part
+                                    string prefix = objectName.Substring(0, prefixEndIndex + "училище".Length).Trim();
+                                    string name = objectName.Substring(prefixEndIndex + "училище".Length).Trim();
 
-                                    // Add quotes around the name portion if not already present
+                                    // Check if the name is not already in quotes and add them
                                     if (!name.StartsWith("\"") && !name.EndsWith("\""))
                                     {
                                         name = $"\"{name}\"";
                                     }
 
-                                    // Combine the prefix and the properly quoted name
+                                    // Combine prefix and name
                                     dataRow[col - 1] = $"{prefix} {name}";
                                 }
                                 else
                                 {
-                                    // If no valid prefix is found, keep the original value
+                                    // If no valid prefix found, just keep the original value
                                     dataRow[col - 1] = objectName;
                                 }
                             }
@@ -126,6 +129,8 @@ public class ExcelController : Controller
                                 dataRow[col - 1] = string.Empty; // Handle empty cells
                             }
                         }
+
+
                         else
                         {
                             var cellValue = worksheet.Cells[row, col].Text;
