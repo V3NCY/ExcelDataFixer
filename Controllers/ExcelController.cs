@@ -126,7 +126,7 @@ public class ExcelController : Controller
                             }
                             else
                             {
-                                dataRow[col - 1] = string.Empty; // Handle empty cells
+                                dataRow[col - 1] = string.Empty; 
                             }
                         }
 
@@ -195,6 +195,10 @@ public class ExcelController : Controller
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
+                                    else if (lastName.EndsWith("СКА")) // Female addressing
+                                    {
+                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
+                                    }
                                     else if (lastName.EndsWith("ов") || lastName.EndsWith("ев")) // Male addressing
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
@@ -207,7 +211,7 @@ public class ExcelController : Controller
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
                                     }
-                                    else if (lastName.EndsWith("ЕВ") || lastName.EndsWith("ЬО")) // Male addressing
+                                    else if (lastName.EndsWith("ЕВ") || lastName.EndsWith("Ь")) // Male addressing
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
                                     }
@@ -218,7 +222,7 @@ public class ExcelController : Controller
                                 }
                                 else
                                 {
-                                    dataRow[col - 1] = string.Empty; // If the column is empty
+                                    dataRow[col - 1] = string.Empty; 
                                 }
                             }
 
