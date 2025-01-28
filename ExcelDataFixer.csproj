@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\revert.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EPPlus" Version="7.5.3" />
   </ItemGroup>
 

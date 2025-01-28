@@ -5,8 +5,20 @@
       "PackagePath": "staticwebassets\\ExcelDataFixer.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\EXCEL DATA PROCESSOR.svg",
+      "PackagePath": "staticwebassets\\EXCEL DATA PROCESSOR.svg"
+    },
+    {
+      "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\clear.svg",
+      "PackagePath": "staticwebassets\\clear.svg"
+    },
+    {
       "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\download.svg",
+      "PackagePath": "staticwebassets\\download.svg"
     },
     {
       "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\favicon.ico",
@@ -243,6 +255,14 @@
     {
       "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\revert.svg",
+      "PackagePath": "staticwebassets\\revert.svg"
+    },
+    {
+      "Id": "C:\\Users\\orak\\source\\repos\\ExcelDataFixer\\ExcelDataFixer\\wwwroot\\upload.svg",
+      "PackagePath": "staticwebassets\\upload.svg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.ExcelDataFixer.Microsoft.AspNetCore.StaticWebAssets.props",
