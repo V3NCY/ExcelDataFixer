@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ExcelDataFixer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+510a65a0068c073a1d26fb8410ffd11e56a91441")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+43bcd22b92a78f1c9029ae1eb13e64339e547f5f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ExcelDataFixer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ExcelDataFixer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

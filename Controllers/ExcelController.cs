@@ -130,7 +130,26 @@ public class ExcelController : Controller
                             }
                         }
 
+                        else if (col == 33) // Column 33 for modified email
+                        {
+                            var email = worksheet.Cells[row, 5]?.Text?.Trim(); // Get the email from column 5 (Търговец имейл)
 
+                            if (!string.IsNullOrWhiteSpace(email))
+                            {
+                                // Remove "@orakgroup.com" from the email address
+                                string modifiedEmail = email.Replace("@orakgroup.com", "").Trim();
+
+                                // Place the modified email in column 33
+                                dataRow[col - 1] = modifiedEmail;
+                            }
+                            else
+                            {
+                                dataRow[col - 1] = string.Empty; // Handle empty email
+                            }
+                        }
+
+
+                        //Replaces Vasil Dinolov data with Cvetan's information
                         else
                         {
                             var cellValue = worksheet.Cells[row, col].Text;
