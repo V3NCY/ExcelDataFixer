@@ -191,14 +191,11 @@ public class ExcelController : Controller
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
-                                    else if (lastName.EndsWith("ска")) // Female addressing
+                                    else if (lastName.EndsWith("ска") || lastName.EndsWith("СКА"))// Female addressing
                                     {
                                         dataRow[col - 1] = $"Уважаема г-жо {lastName}";
                                     }
-                                    else if (lastName.EndsWith("СКА")) // Female addressing
-                                    {
-                                        dataRow[col - 1] = $"Уважаема г-жо {lastName}";
-                                    }
+                                    
                                     else if (lastName.EndsWith("ов") || lastName.EndsWith("ев")) // Male addressing
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
