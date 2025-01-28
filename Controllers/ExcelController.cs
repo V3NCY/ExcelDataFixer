@@ -203,6 +203,14 @@ public class ExcelController : Controller
                                     {
                                         dataRow[col - 1] = $"Уважаеми г-н {lastName}";
                                     }
+                                    else if (lastName.EndsWith("СКИ") || lastName.EndsWith("ОВ")) // Male addressing
+                                    {
+                                        dataRow[col - 1] = $"Уважаеми г-н {lastName}";
+                                    }
+                                    else if (lastName.EndsWith("ЕВ") || lastName.EndsWith("ЬО")) // Male addressing
+                                    {
+                                        dataRow[col - 1] = $"Уважаеми г-н {lastName}";
+                                    }
                                     else
                                     {
                                         dataRow[col - 1] = $"{lastName}"; // Gives just the surname if its unidentified
