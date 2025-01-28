@@ -100,35 +100,66 @@ public class ExcelController : Controller
 
                             if (!string.IsNullOrWhiteSpace(objectName))
                             {
-                                // Check if the word "училище" exists and identify the prefix and name
-                                var prefixEndIndex = objectName.ToLower().IndexOf("училище");
+                                // Check for known prefixes (e.g., "училище", "гимназия", "ПГ", "СУ", etc.)
+                                string[] prefixes = { "училище", "гимназия", "ОУ", "ПГ", "СУ", "НУ", "ПАГ", "ПГТ", 
+                                    "НУИ", "ФЕГ", "Профилирана гимназия", "Професионална гимназия", "Начално училище", 
+                                    "Основно училище", "Френска езикова гимназия", "Гимназия с преподаване на чужди езици",
+                                    "Професионална гимназия по морско корабоплаване и риболов", "Професионална гимназия по химични и хранителни технологии",
+                                    "Професионална гимназия по икономика", "Средно училище за чужди езици и мениджмънт", "Гимназия с изучаване на чужд език",
+                                    "Гимназия с преподаване на испански език", "Професионална гимназия по електротехника и автоматика",
+                                    "ПГСС", "Професионална гимназия по туризъм", "Професионална гимназия по дървообработване и строителство",
+                                    "Природо-математическа гимназия със засилено изучаване на чужди езици", "Професионална гимназия по селско стопанство и икономика",
+                                    "Национална професионална гимназия по полиграфия и фотография","Национално училище за музикално и танцово изкуство",
+                                    "НУИ", "Национално училище за танцово изкуство", "Национална гимназия за древни езици и култури",
+                                    "Национална професионална гимназия по компютърни технологии и системи", "ПМГ", "Професионална гимназия по строителство, архитектура и геодезия",
+                                    "ППМГ", "ПАГ", "ПГ по търговия и ресторантьорство", "Национална Априловска гимназия", "ПТГ", "ПГМЕТ", "Национална Професионална гимназия по прецизна техника и оптика",
+                                    "Професионална гимназия по транспорт", "Средно училище с изучаване на чужди езици", "Технологично училище", 
+                                    "ИОУ", "Професионална гимназия по Дизайн", "Национална търговско - банкова гимназия", "Профилирана природо-математическа гимназия",
+                                    "Професионална гимназия по селско стопанство", "Национална търговска гимназия", "Професионална гимназия по вътрешна архитектура и дървообработване",
 
-                                if (prefixEndIndex >= 0 && prefixEndIndex < objectName.Length)
+                                };
+
+
+                                string prefix = null;
+                                string name = objectName;
+
+                                // Check each prefix and adjust the split point if found
+                                foreach (var p in prefixes)
                                 {
-                                    // Extract prefix (e.g., "Основно училище") and the name part
-                                    string prefix = objectName.Substring(0, prefixEndIndex + "училище".Length).Trim();
-                                    string name = objectName.Substring(prefixEndIndex + "училище".Length).Trim();
+                                    var prefixEndIndex = objectName.IndexOf(p, StringComparison.OrdinalIgnoreCase);
 
-                                    // Check if the name is not already in quotes and add them
+                                    if (prefixEndIndex >= 0)
+                                    {
+                                        prefix = objectName.Substring(0, prefixEndIndex + p.Length).Trim();
+                                        name = objectName.Substring(prefixEndIndex + p.Length).Trim();
+                                        break; // Stop when the first matching prefix is found
+                                    }
+                                }
+
+                                // If a prefix was found, format the name with quotes if necessary
+                                if (prefix != null)
+                                {
+                                    // Add quotes around the name portion if not already present
                                     if (!name.StartsWith("\"") && !name.EndsWith("\""))
                                     {
                                         name = $"\"{name}\"";
                                     }
 
-                                    // Combine prefix and name
+                                    // Combine the prefix and the name
                                     dataRow[col - 1] = $"{prefix} {name}";
                                 }
                                 else
                                 {
-                                    // If no valid prefix found, just keep the original value
+                                    // If no valid prefix was found, keep the original value
                                     dataRow[col - 1] = objectName;
                                 }
                             }
                             else
                             {
-                                dataRow[col - 1] = string.Empty; 
+                                dataRow[col - 1] = string.Empty; // Handle empty cells
                             }
                         }
+
 
                         else if (col == 33) // Column 33 for modified email
                         {
@@ -418,7 +449,7 @@ public class ExcelController : Controller
             package.SaveAs(stream);
             stream.Position = 0;
 
-            var fileName = $"ProcessedFile-edited.xlsx";
+            var fileName = $"ProcessedFile.xlsx";
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 

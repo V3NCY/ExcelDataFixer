@@ -25,6 +25,7 @@ C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelD
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.RazorAssemblyInfo.cache
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.RazorAssemblyInfo.cs
+C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.sourcelink.json
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\staticwebassets\msbuild.ExcelDataFixer.Microsoft.AspNetCore.StaticWebAssets.props
@@ -41,4 +42,3 @@ C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\refint
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.pdb
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.genruntimeconfig.cache
 C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ref\ExcelDataFixer.dll
-C:\Users\orak\source\repos\ExcelDataFixer\ExcelDataFixer\obj\Debug\net8.0\ExcelDataFixer.sourcelink.json
