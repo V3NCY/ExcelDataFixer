@@ -193,7 +193,7 @@
         <p>or</p>
         <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Browse File</button>
         <input type="file" id="fileInput" class="hidden-input" accept=".xlsx, .xls" onchange="handleFileUpload()">
-        <p id="fileName" class="file-name"></p> <!-- Displays the uploaded file name -->
+        <p id="fileName" class="file-name"></p> 
     </div>
 
     <form id="uploadForm" asp-controller="Excel" asp-action="ProcessExcel" enctype="multipart/form-data" method="post" style="text-align: center;">
@@ -216,29 +216,34 @@
     </form>
 
     <button id="toTopBtn" onclick="scrollToTop()">↑ Top</button>
-        <div class="table-container">
-            <table>
-                <thead>
+    @if (ViewBag.DataTable != null)
+    {
+        <table>
+            <thead>
+                <tr>
+                    @foreach (System.Data.DataColumn column in ((System.Data.DataTable)ViewBag.DataTable).Columns)
+                    {
+                        <th>@column.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows)
+                {
                     <tr>
-                        @foreach (System.Data.DataColumn column in ((System.Data.DataTable)ViewBag.DataTable).Columns)
+                        @foreach (var item in row.ItemArray)
                         {
-                            <th>@column.ColumnName</th>
+                            <td>@item</td>
                         }
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows)
-                    {
-                        <tr>
-                            @foreach (var item in row.ItemArray)
-                            {
-                                <td>@item</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No data available. Please upload a valid Excel file.</p>
+    }
 
 </div>
 
