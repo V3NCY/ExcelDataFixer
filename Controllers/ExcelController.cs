@@ -25,6 +25,7 @@ public class ExcelController : Controller
         if (excelFile == null || excelFile.Length == 0)
         {
             ViewBag.Message = "Please upload a valid Excel file.";
+            ViewBag.DataTable = null; 
             return View("Index");
         }
 
