@@ -68,51 +68,41 @@
     }
 
     .table-container {
-        border-radius: 5px;
         max-width: 100%;
-        overflow-x: auto; /* Enables horizontal scrolling within the container */
-        white-space: nowrap; /* Ensures that content does not break into new lines */
-        padding-bottom: 10px; /* Adds some space below */
-        margin-bottom: 20px;
+        overflow-x: auto;
+        margin: 20px 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
         table {
-        width: max-content;
-        margin: 0 auto; 
-        border-collapse: separate;
-        border-spacing: 0;
-        font-family: 'Arial', sans-serif;
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
         font-size: 14px;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
         table th, table td {
-            padding: 12px;
+            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
 
         table th {
-            background-color: #EDEDED;
-            color: #333;
+            background-color: #f4f4f4;
             font-weight: bold;
-            text-transform: uppercase;
         }
 
         table tr:nth-child(even) {
-            background-color: #FAFAFA;
+            background-color: #f9f9f9;
         }
 
         table tr:hover {
-            background-color: #F0F8FF;
-            transition: background-color 0.3s ease;
+            background-color: #f1f1f1;
         }
 
-        table td {
-            color: #555;
-        }
+        
 
         .logo {
             text-align: center;
@@ -213,33 +203,35 @@
 
     <button id="toTopBtn" onclick="scrollToTop()">↑ Top</button>
     <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    @foreach (System.Data.DataColumn column in ((System.Data.DataTable)ViewBag.DataTable).Columns)
-                    {
-                        <th>@column.ColumnName</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows)
-                {
+        @if (ViewBag.DataTable != null && ((System.Data.DataTable)ViewBag.DataTable).Rows.Count > 0)
+        {
+            <table>
+                <thead>
                     <tr>
-                        @foreach (var item in row.ItemArray)
+                        @foreach (System.Data.DataColumn column in ((System.Data.DataTable)ViewBag.DataTable).Columns)
                         {
-                            <td>@item</td>
+                            <th>@column.ColumnName</th>
                         }
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows)
+                    {
+                        <tr>
+                            @foreach (var item in row.ItemArray)
+                            {
+                                <td>@item</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No data available. Please upload a valid Excel file.</p>
+        }
     </div>
-}
-    else
-    {
-        <p>No data available. Please upload a valid Excel file.</p>
-    }
 
 </div>
 
