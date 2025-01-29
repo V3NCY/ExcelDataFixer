@@ -107,14 +107,10 @@
             text-align: center;
         }
 
-    #toTopBtn {
-        display: none; /* Initially hidden */
+    #toTopBtn, #toBottomBtn {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
         z-index: 1000;
         font-size: 16px;
-        background: linear-gradient(45deg, #449e1c, #0a4070);
         color: white;
         border: none;
         padding: 10px 15px;
@@ -124,10 +120,32 @@
         transition: 0.3s;
     }
 
+    /* Scroll to Top Button */
+    #toTopBtn {
+        display: none;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+
         #toTopBtn:hover {
-            background: linear-gradient(45deg, #0a4070, #449e1c);
+            background: linear-gradient(45deg, #0056b3, #007bff);
             transform: scale(1.1);
         }
+
+    /* Scroll to Bottom Button */
+    #toBottomBtn {
+        display: none;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #28a745, #1e7e34);
+    }
+
+        #toBottomBtn:hover {
+            background: linear-gradient(45deg, #1e7e34, #28a745);
+            transform: scale(1.1);
+        }
+
 
     ::-webkit-scrollbar {
         width: 12px; /* Adjust the width of the scrollbar */
@@ -147,7 +165,8 @@
 </style>
 
 <div class="container">
-   
+    <button id="toBottomBtn" onclick="scrollToBottom()">↓ Bottom</button>
+
     <div class="logo">
     <img src="~/EXCEL DATA PROCESSOR.svg" width="250" />
     </div>
@@ -180,7 +199,7 @@
         <button type="submit" class="btn-icon"><img src="~/download.svg" width="45" style="text-align: start;" /></button>
     </form>
 
-        <button id="toTopBtn" onclick="scrollToTop()">⬆ Top</button>
+    <button id="toTopBtn" onclick="scrollToTop()">↑ Top</button>
     @if (ViewBag.DataTable != null)
     {
         <table>
@@ -242,18 +261,31 @@
     }
 </script>
 <script>
-    // Show/hide button on scroll
     window.onscroll = function () {
-        let btn = document.getElementById("toTopBtn");
-        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-            btn.style.display = "block";
+        const toTopBtn = document.getElementById("toTopBtn");
+        const toBottomBtn = document.getElementById("toBottomBtn");
+
+        if (document.documentElement.scrollTop > 100 || document.body.scrollTop > 100) {
+            toTopBtn.style.display = "block";
+
+            if (window.innerHeight + window.scrollY < document.body.offsetHeight) {
+                toBottomBtn.style.display = "block";
+            } else {
+                toBottomBtn.style.display = "none"; 
+            }
         } else {
-            btn.style.display = "none";
+            toTopBtn.style.display = "none";
+
+            toBottomBtn.style.display = "none";
         }
     };
 
-    // Smooth scroll to top
     function scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    function scrollToBottom() {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
 </script>
